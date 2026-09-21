@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
 
 sealed class Screen(val route: String, val label: String = "", val icon: @Composable () -> Unit = {}) {
     object Home : Screen("home", "Inicio", { Icon(Icons.Default.Home, contentDescription = null) })
-    object Cases : Screen("cases", "Casos", { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null) })
+    object Cases : Screen("cases?filter={filter}", "Casos", { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null) })
     object AddCase : Screen("add_case")
     object EditCase : Screen("edit_case/{caseId}")
     object CaseDetail : Screen("case_detail/{caseId}")
@@ -69,17 +69,25 @@ fun CaseTrackApp(factory: CaseViewModelFactory) {
             val currentDestination = navBackStackEntry?.destination
             
             // Solo mostrar bottom bar en pantallas principales
-            val showBottomBar = bottomNavItems.any { it.route == currentDestination?.route }
+            val showBottomBar = currentDestination?.route?.startsWith("home") == true || 
+                               currentDestination?.route?.startsWith("cases") == true
             
             if (showBottomBar) {
                 NavigationBar {
                     bottomNavItems.forEach { screen ->
+                        val isSelected = if (screen == Screen.Cases) {
+                            currentDestination?.route?.startsWith("cases") == true
+                        } else {
+                            currentDestination?.hierarchy?.any { it.route == screen.route } == true
+                        }
+                        
                         NavigationBarItem(
                             icon = screen.icon,
                             label = { Text(screen.label) },
-                            selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                            selected = isSelected,
                             onClick = {
-                                navController.navigate(screen.route) {
+                                val route = if (screen == Screen.Cases) "cases" else screen.route
+                                navController.navigate(route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
                                     }
@@ -95,7 +103,7 @@ fun CaseTrackApp(factory: CaseViewModelFactory) {
         floatingActionButton = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
-            if (currentRoute == Screen.Home.route || currentRoute == Screen.Cases.route) {
+            if (currentRoute == Screen.Home.route || currentRoute?.startsWith("cases") == true) {
                 FloatingActionButton(onClick = { navController.navigate(Screen.AddCase.route) }) {
                     Icon(Icons.Default.Add, contentDescription = "Nuevo Caso")
                 }
@@ -107,11 +115,40 @@ fun CaseTrackApp(factory: CaseViewModelFactory) {
             startDestination = Screen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Home.route) { HomeScreen(viewModel) }
-            composable(Screen.Cases.route) { 
-                CaseListScreen(viewModel, onCaseClick = { id -> 
-                    navController.navigate("case_detail/$id")
-                }) 
+            composable(Screen.Home.route) { 
+                HomeScreen(
+                    viewModel = viewModel,
+                    onNavigateToCases = { filter ->
+                        val route = if (filter != null) "cases?filter=$filter" else "cases"
+                        navController.navigate(route) {
+                            // Sincronizar con comportamiento de la barra inferior
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onNavigateToAddCase = {
+                        navController.navigate(Screen.AddCase.route)
+                    }
+                ) 
+            }
+            composable(
+                route = Screen.Cases.route,
+                arguments = listOf(navArgument("filter") { 
+                    nullable = true
+                    defaultValue = null 
+                })
+            ) { backStackEntry ->
+                val filter = backStackEntry.arguments?.getString("filter")
+                CaseListScreen(
+                    viewModel = viewModel, 
+                    initialFilter = filter,
+                    onCaseClick = { id -> 
+                        navController.navigate("case_detail/$id")
+                    }
+                ) 
             }
             composable(Screen.AddCase.route) { 
                 AddEditCaseScreen(viewModel, onSaveSuccess = { 

@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.parcial_1.model.Case
 import com.example.parcial_1.model.CaseStatus
+import com.example.parcial_1.ui.components.AppHeader
 import com.example.parcial_1.viewmodel.CaseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,8 +25,6 @@ fun AddEditCaseScreen(
     var status by remember { mutableStateOf(CaseStatus.IN_INVESTIGATION) }
     var startDate by remember { mutableStateOf(System.currentTimeMillis()) }
     var caseNumber by remember { mutableStateOf("") }
-    var findings by remember { mutableStateOf("") }
-    var evidence by remember { mutableStateOf("") }
     
     LaunchedEffect(caseId) {
         if (caseId != null) {
@@ -37,17 +36,18 @@ fun AddEditCaseScreen(
                 status = existingCase.status
                 startDate = existingCase.startDate
                 caseNumber = existingCase.caseNumber
-                findings = existingCase.findings
-                evidence = existingCase.evidence
             }
         }
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(if (caseId == null) "Nuevo Caso" else "Editar Caso") }
-            )
+            Column {
+                AppHeader(subtitle = if (caseId == null) "Registrar nuevo expediente" else "Actualizar información del caso")
+                TopAppBar(
+                    title = { Text(if (caseId == null) "Nuevo Caso" else "Editar Caso") }
+                )
+            }
         }
     ) { padding ->
         Column(
@@ -80,22 +80,6 @@ fun AddEditCaseScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            OutlinedTextField(
-                value = findings,
-                onValueChange = { findings = it },
-                label = { Text("Hallazgos") },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 2
-            )
-
-            OutlinedTextField(
-                value = evidence,
-                onValueChange = { evidence = it },
-                label = { Text("Evidencias") },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 2
-            )
-            
             Text("Estado", style = MaterialTheme.typography.labelLarge)
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 CaseStatus.entries.forEach { s ->
@@ -120,9 +104,7 @@ fun AddEditCaseScreen(
                             "Caso #${(100..999).random()}"
                         } else {
                             caseNumber
-                        },
-                        findings = findings,
-                        evidence = evidence
+                        }
                     )
                     if (caseId == null) {
                         viewModel.insertCase(finalCase)

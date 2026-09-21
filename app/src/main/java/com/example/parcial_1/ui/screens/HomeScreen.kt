@@ -1,5 +1,6 @@
 package com.example.parcial_1.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -17,91 +18,83 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.parcial_1.ui.components.AppHeader
 import com.example.parcial_1.ui.theme.CaseTrackTheme
 import com.example.parcial_1.viewmodel.CaseViewModel
 
 @Composable
-fun HomeScreen(viewModel: CaseViewModel) {
+fun HomeScreen(
+    viewModel: CaseViewModel,
+    onNavigateToCases: (String?) -> Unit,
+    onNavigateToAddCase: () -> Unit
+) {
     val activeCount by viewModel.activeCasesCount.collectAsState()
     val closedCount by viewModel.closedCasesCount.collectAsState()
 
-    HomeScreenContent(activeCount, closedCount)
+    HomeScreenContent(
+        activeCount = activeCount,
+        closedCount = closedCount,
+        onCasesClick = { onNavigateToCases(null) },
+        onAddCaseClick = onNavigateToAddCase,
+        onClosedCasesClick = { onNavigateToCases("CLOSED") }
+    )
 }
 
 @Composable
-fun HomeScreenContent(activeCount: Int, closedCount: Int) {
+fun HomeScreenContent(
+    activeCount: Int,
+    closedCount: Int,
+    onCasesClick: () -> Unit,
+    onAddCaseClick: () -> Unit,
+    onClosedCasesClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = "CaseTrack",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "Tus casos, siempre bajo control",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+        AppHeader()
+
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Hola, Detective",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "La verdad siempre deja rastro",
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            val cards = listOf(
+                HomeCardData("Mis casos", "$activeCount activos", Icons.Default.Folder, MaterialTheme.colorScheme.primaryContainer, onCasesClick),
+                HomeCardData("Nuevo caso", "Registrar ahora", Icons.Default.Add, MaterialTheme.colorScheme.secondaryContainer, onAddCaseClick),
+                HomeCardData("Casos cerrados", "$closedCount finalizados", Icons.Default.AccessTime, MaterialTheme.colorScheme.surfaceVariant, onClosedCasesClick)
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(cards) { card ->
+                    HomeCard(card)
+                }
             }
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = "Perfil",
-                modifier = Modifier.size(40.dp)
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            Text(
+                text = "\"Observar, Analizar, Concluir.\"",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                fontSize = 14.sp,
+                fontStyle = FontStyle.Italic,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            text = "Hola, Detective",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "La verdad siempre deja rastro",
-            fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        val cards = listOf(
-            HomeCardData("Mis casos", "$activeCount activos", Icons.Default.Folder, MaterialTheme.colorScheme.primaryContainer),
-            HomeCardData("Nuevo caso", "Registrar ahora", Icons.Default.Add, MaterialTheme.colorScheme.secondaryContainer),
-            HomeCardData("Estadísticas", "Tu actividad", Icons.Default.BarChart, MaterialTheme.colorScheme.tertiaryContainer),
-            HomeCardData("Casos cerrados", "$closedCount finalizados", Icons.Default.AccessTime, MaterialTheme.colorScheme.surfaceVariant)
-        )
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(cards) { card ->
-                HomeCard(card)
-            }
-        }
-        
-        Spacer(modifier = Modifier.weight(1f))
-        
-        Text(
-            text = "\"Observar. Analizar. Concluir.\"",
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            fontSize = 14.sp,
-            fontStyle = FontStyle.Italic,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 
@@ -109,16 +102,17 @@ data class HomeCardData(
     val title: String,
     val subtitle: String,
     val icon: ImageVector,
-    val color: Color
+    val color: Color,
+    val onClick: () -> Unit
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeCard(data: HomeCardData) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(140.dp),
+            .height(140.dp)
+            .clickable(onClick = data.onClick),
         colors = CardDefaults.cardColors(containerColor = data.color)
     ) {
         Column(
@@ -140,6 +134,6 @@ fun HomeCard(data: HomeCardData) {
 @Composable
 fun HomeScreenPreview() {
     CaseTrackTheme {
-        HomeScreenContent(5, 3)
+        HomeScreenContent(5, 3, {}, {}, {})
     }
 }

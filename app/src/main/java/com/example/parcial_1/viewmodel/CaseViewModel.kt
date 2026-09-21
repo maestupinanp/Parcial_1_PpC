@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.parcial_1.logic.CaseRepository
 import com.example.parcial_1.model.Case
+import com.example.parcial_1.model.Evidence
+import com.example.parcial_1.model.Finding
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -44,6 +47,24 @@ class CaseViewModel(private val repository: CaseRepository) : ViewModel() {
 
     suspend fun getCaseById(id: Int): Case? {
         return repository.getCaseById(id)
+    }
+
+    // Findings
+    fun getFindingsForCase(caseId: Int): Flow<List<Finding>> {
+        return repository.getFindingsForCase(caseId)
+    }
+
+    fun insertFinding(finding: Finding) = viewModelScope.launch {
+        repository.insertFinding(finding)
+    }
+
+    // Evidence
+    fun getEvidenceForCase(caseId: Int): Flow<List<Evidence>> {
+        return repository.getEvidenceForCase(caseId)
+    }
+
+    fun insertEvidence(evidence: Evidence) = viewModelScope.launch {
+        repository.insertEvidence(evidence)
     }
 }
 
