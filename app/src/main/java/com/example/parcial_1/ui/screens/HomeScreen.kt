@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.parcial_1.ui.theme.CaseTrackTheme
-import com.example.parcial_1.ui.viewmodel.CaseViewModel
+import com.example.parcial_1.viewmodel.CaseViewModel
 
 @Composable
 fun HomeScreen(viewModel: CaseViewModel) {

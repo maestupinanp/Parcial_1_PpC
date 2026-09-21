@@ -15,10 +15,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.parcial_1.data.model.Case
-import com.example.parcial_1.data.model.CaseStatus
+import com.example.parcial_1.model.Case
+import com.example.parcial_1.model.CaseStatus
 import com.example.parcial_1.ui.theme.CaseTrackTheme
-import com.example.parcial_1.ui.viewmodel.CaseViewModel
+import com.example.parcial_1.viewmodel.CaseViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 

@@ -7,9 +7,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.parcial_1.data.model.Case
-import com.example.parcial_1.data.model.CaseStatus
-import com.example.parcial_1.ui.viewmodel.CaseViewModel
+import com.example.parcial_1.model.Case
+import com.example.parcial_1.model.CaseStatus
+import com.example.parcial_1.viewmodel.CaseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,6 +24,8 @@ fun AddEditCaseScreen(
     var status by remember { mutableStateOf(CaseStatus.IN_INVESTIGATION) }
     var startDate by remember { mutableStateOf(System.currentTimeMillis()) }
     var caseNumber by remember { mutableStateOf("") }
+    var findings by remember { mutableStateOf("") }
+    var evidence by remember { mutableStateOf("") }
     
     LaunchedEffect(caseId) {
         if (caseId != null) {
@@ -35,6 +37,8 @@ fun AddEditCaseScreen(
                 status = existingCase.status
                 startDate = existingCase.startDate
                 caseNumber = existingCase.caseNumber
+                findings = existingCase.findings
+                evidence = existingCase.evidence
             }
         }
     }
@@ -75,6 +79,22 @@ fun AddEditCaseScreen(
                 label = { Text("Cliente / Solicitante") },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            OutlinedTextField(
+                value = findings,
+                onValueChange = { findings = it },
+                label = { Text("Hallazgos") },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 2
+            )
+
+            OutlinedTextField(
+                value = evidence,
+                onValueChange = { evidence = it },
+                label = { Text("Evidencias") },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 2
+            )
             
             Text("Estado", style = MaterialTheme.typography.labelLarge)
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -100,7 +120,9 @@ fun AddEditCaseScreen(
                             "Caso #${(100..999).random()}"
                         } else {
                             caseNumber
-                        }
+                        },
+                        findings = findings,
+                        evidence = evidence
                     )
                     if (caseId == null) {
                         viewModel.insertCase(finalCase)

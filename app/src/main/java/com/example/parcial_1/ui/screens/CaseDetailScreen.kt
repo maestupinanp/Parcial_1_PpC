@@ -1,6 +1,8 @@
 package com.example.parcial_1.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
@@ -11,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.parcial_1.data.model.Case
-import com.example.parcial_1.ui.viewmodel.CaseViewModel
+import com.example.parcial_1.model.Case
+import com.example.parcial_1.viewmodel.CaseViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,6 +28,7 @@ fun CaseDetailScreen(
 ) {
     var case by remember { mutableStateOf<Case?>(null) }
     val dateFormat = remember { SimpleDateFormat("dd MMM yyyy", Locale.getDefault()) }
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(caseId) {
         case = viewModel.getCaseById(caseId)
@@ -53,6 +56,7 @@ fun CaseDetailScreen(
                 modifier = Modifier
                     .padding(padding)
                     .padding(16.dp)
+                    .verticalScroll(scrollState)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -74,14 +78,14 @@ fun CaseDetailScreen(
                 DetailItem(label = "Cliente / Solicitante", value = c.clientName)
                 DetailItem(label = "Descripción", value = c.description)
                 
-                Spacer(modifier = Modifier.weight(1f))
+                HorizontalDivider()
                 
-                Button(
-                    onClick = { /* TODO: Implement more actions */ },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Agregar hallazgo")
-                }
+                Text(text = "Investigación", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                
+                DetailItem(label = "Hallazgos", value = c.findings.ifBlank { "Sin hallazgos registrados" })
+                DetailItem(label = "Evidencias", value = c.evidence.ifBlank { "Sin evidencias registradas" })
+                
+                Spacer(modifier = Modifier.height(32.dp))
             }
         } ?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
