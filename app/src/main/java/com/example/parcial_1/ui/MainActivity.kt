@@ -120,14 +120,7 @@ fun CaseTrackApp(factory: CaseViewModelFactory) {
                     viewModel = viewModel,
                     onNavigateToCases = { filter ->
                         val route = if (filter != null) "cases?filter=$filter" else "cases"
-                        navController.navigate(route) {
-                            // Sincronizar con comportamiento de la barra inferior
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+                        navController.navigate(route)
                     },
                     onNavigateToAddCase = {
                         navController.navigate(Screen.AddCase.route)
@@ -151,18 +144,30 @@ fun CaseTrackApp(factory: CaseViewModelFactory) {
                 ) 
             }
             composable(Screen.AddCase.route) { 
-                AddEditCaseScreen(viewModel, onSaveSuccess = { 
-                    navController.navigateUp()
-                }) 
+                AddEditCaseScreen(viewModel = viewModel,
+                    onSaveSuccess = {
+                        navController.navigateUp()
+                    },
+                    onDeleteSuccess = {
+                        navController.navigateUp()
+                    }
+                )
             }
             composable(
                 route = Screen.EditCase.route,
                 arguments = listOf(navArgument("caseId") { type = NavType.IntType })
             ) { backStackEntry ->
                 val caseId = backStackEntry.arguments?.getInt("caseId")
-                AddEditCaseScreen(viewModel, caseId = caseId, onSaveSuccess = {
-                    navController.navigateUp()
-                })
+                AddEditCaseScreen(
+                    viewModel = viewModel,
+                    caseId = caseId,
+                    onSaveSuccess = {
+                        navController.navigateUp()
+                    },
+                    onDeleteSuccess = {
+                        navController.navigateUp()
+                        }
+                    )
             }
             composable(
                 route = Screen.CaseDetail.route,

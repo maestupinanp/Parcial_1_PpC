@@ -3,6 +3,9 @@ package com.example.parcial_1.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,19 +20,25 @@ import com.example.parcial_1.viewmodel.CaseViewModel
 fun AddEditCaseScreen(
     viewModel: CaseViewModel,
     caseId: Int? = null,
-    onSaveSuccess: () -> Unit
+    onSaveSuccess: () -> Unit,
+    onDeleteSuccess: () -> Unit
 ) {
+
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var clientName by remember { mutableStateOf("") }
     var status by remember { mutableStateOf(CaseStatus.IN_INVESTIGATION) }
     var startDate by remember { mutableStateOf(System.currentTimeMillis()) }
     var caseNumber by remember { mutableStateOf("") }
-    
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var currentCase by remember { mutableStateOf<Case?>(null) }
+
     LaunchedEffect(caseId) {
         if (caseId != null) {
             val existingCase = viewModel.getCaseById(caseId)
             if (existingCase != null) {
+                currentCase = existingCase
                 title = existingCase.title
                 description = existingCase.description
                 clientName = existingCase.clientName
@@ -40,12 +49,42 @@ fun AddEditCaseScreen(
         }
     }
 
+    if(showDeleteDialog){
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Eliminar Caso")},
+            text = { Text("¿Estás seguro de que deseas eliminar este caso?")},
+            confirmButton = {
+                Button(onClick = {
+                    viewModel.deleteCase(currentCase!!)
+                    onDeleteSuccess()
+                    showDeleteDialog = false
+                }) {
+                    Text("Eliminar definitivamente")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDeleteDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             Column {
                 AppHeader(subtitle = if (caseId == null) "Registrar nuevo expediente" else "Actualizar información del caso")
                 TopAppBar(
-                    title = { Text(if (caseId == null) "Nuevo Caso" else "Editar Caso") }
+                    title = { Text(if (caseId == null) "Nuevo Caso" else "Editarr Caso") },
+                    actions = {
+                        if (caseId != null) {
+                            IconButton(onClick = { showDeleteDialog = true }) {
+                                Icon(Icons.Default.Delete, contentDescription = "Eliminar")
+                            }
+
+                        }
+                    }
                 )
             }
         }

@@ -137,7 +137,7 @@ fun CaseItem(case: Case, onClick: () -> Unit) {
     ) {
         Row(
             modifier = Modifier
-                .padding(12.dp)
+                .padding(14.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -164,7 +164,7 @@ fun CaseItem(case: Case, onClick: () -> Unit) {
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
-                    StatusBadge(status = case.status)
+
                 }
                 Text(
                     text = "Caso #${case.id}",
@@ -176,6 +176,8 @@ fun CaseItem(case: Case, onClick: () -> Unit) {
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                StatusBadge(status = case.status)
+
             }
         }
     }
