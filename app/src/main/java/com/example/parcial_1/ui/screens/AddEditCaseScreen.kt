@@ -33,6 +33,8 @@ fun AddEditCaseScreen(
     var caseNumber by remember { mutableStateOf("") }
 
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showNameErrorDialog by remember { mutableStateOf(false) }
+    var showSuccessDeleteDialog by remember { mutableStateOf(false) }
     var currentCase by remember { mutableStateOf<Case?>(null) }
 
     LaunchedEffect(caseId) {
@@ -59,8 +61,8 @@ fun AddEditCaseScreen(
             confirmButton = {
                 Button(onClick = {
                     viewModel.deleteCase(currentCase!!)
-                    onDeleteSuccess()
                     showDeleteDialog = false
+                    showSuccessDeleteDialog = true
                 }) {
                     Text("Eliminar definitivamente")
                 }
@@ -68,6 +70,35 @@ fun AddEditCaseScreen(
             dismissButton = {
                 Button(onClick = { showDeleteDialog = false }) {
                     Text("Cancelar")
+                }
+            }
+        )
+    }
+
+    if (showNameErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { showNameErrorDialog = false },
+            title = { Text("Nombre duplicado") },
+            text = { Text("Ya existe un caso con este nombre. Por favor, elige un título diferente.") },
+            confirmButton = {
+                TextButton(onClick = { showNameErrorDialog = false }) {
+                    Text("Entendido")
+                }
+            }
+        )
+    }
+
+    if (showSuccessDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text("Operación exitosa") },
+            text = { Text("Caso eliminado con éxito") },
+            confirmButton = {
+                Button(onClick = {
+                    showSuccessDeleteDialog = false
+                    onDeleteSuccess()
+                }) {
+                    Text("Volver al inicio")
                 }
             }
         )
@@ -160,18 +191,21 @@ fun AddEditCaseScreen(
                         status = status,
                         closingPrecedent = if (status == CaseStatus.CLOSED) closingPrecedent else "",
                         startDate = startDate,
-                        caseNumber = if (caseNumber.isBlank() && caseId == null) {
-                            "Caso #${(100..999).random()}"
-                        } else {
-                            caseNumber
-                        }
+                        caseNumber = caseNumber
                     )
                     if (caseId == null) {
-                        viewModel.insertCase(finalCase)
+                        viewModel.insertCase(
+                            case = finalCase, 
+                            onNameExists = { showNameErrorDialog = true },
+                            onSuccess = onSaveSuccess
+                        )
                     } else {
-                        viewModel.updateCase(finalCase)
+                        viewModel.updateCase(
+                            case = finalCase, 
+                            onNameExists = { showNameErrorDialog = true },
+                            onSuccess = onSaveSuccess
+                        )
                     }
-                    onSaveSuccess()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = title.isNotBlank() && 

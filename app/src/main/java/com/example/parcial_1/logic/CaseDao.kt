@@ -22,8 +22,14 @@ interface CaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCase(case: Case): Long
 
+    @Query("SELECT * FROM cases ORDER BY startDate ASC")
+    suspend fun getAllCasesList(): List<Case>
+
     @Update
     suspend fun updateCase(case: Case)
+
+    @Update
+    suspend fun updateCases(cases: List<Case>)
 
     @Delete
     suspend fun deleteCase(case: Case)

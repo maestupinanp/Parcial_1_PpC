@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun AppHeader(
     title: String = "InvestigadorApp",
-    subtitle: String = "Tus casos, siempre a la mano"
+    subtitle: String = "Nada pasa desapercibido"
 ) {
     Row(
         modifier = Modifier

@@ -33,12 +33,26 @@ class CaseViewModel(private val repository: CaseRepository) : ViewModel() {
         initialValue = 0
     )
 
-    fun insertCase(case: Case) = viewModelScope.launch {
-        repository.insertCase(case)
+    fun insertCase(case: Case, onNameExists: () -> Unit = {}, onSuccess: () -> Unit = {}) = viewModelScope.launch {
+        val exists = allCases.value.any { it.title.equals(case.title, ignoreCase = true) }
+        if (exists) {
+            onNameExists()
+        } else {
+            repository.insertCase(case)
+            onSuccess()
+        }
     }
 
-    fun updateCase(case: Case) = viewModelScope.launch {
-        repository.updateCase(case)
+    fun updateCase(case: Case, onNameExists: () -> Unit = {}, onSuccess: () -> Unit = {}) = viewModelScope.launch {
+        val exists = allCases.value.any { 
+            it.title.equals(case.title, ignoreCase = true) && it.id != case.id 
+        }
+        if (exists) {
+            onNameExists()
+        } else {
+            repository.updateCase(case)
+            onSuccess()
+        }
     }
 
     fun deleteCase(case: Case) = viewModelScope.launch {

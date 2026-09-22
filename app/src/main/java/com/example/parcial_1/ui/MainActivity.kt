@@ -100,15 +100,6 @@ fun CaseTrackApp(factory: CaseViewModelFactory) {
                 }
             }
         },
-        floatingActionButton = {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry?.destination?.route
-            if (currentRoute == Screen.Home.route || currentRoute?.startsWith("cases") == true) {
-                FloatingActionButton(onClick = { navController.navigate(Screen.AddCase.route) }) {
-                    Icon(Icons.Default.Add, contentDescription = "Nuevo Caso")
-                }
-            }
-        }
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -149,7 +140,9 @@ fun CaseTrackApp(factory: CaseViewModelFactory) {
                         navController.navigateUp()
                     },
                     onDeleteSuccess = {
-                        navController.navigateUp()
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) { inclusive = false }
+                        }
                     }
                 )
             }
@@ -165,8 +158,10 @@ fun CaseTrackApp(factory: CaseViewModelFactory) {
                         navController.navigateUp()
                     },
                     onDeleteSuccess = {
-                        navController.navigateUp()
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) { inclusive = false }
                         }
+                    }
                     )
             }
             composable(

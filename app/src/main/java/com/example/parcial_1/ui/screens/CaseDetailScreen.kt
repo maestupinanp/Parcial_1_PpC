@@ -84,7 +84,7 @@ fun CaseDetailScreen(
                     StatusBadge(status = c.status)
                 }
                 
-                Text(text = "Caso #${c.id}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = c.caseNumber, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
                     text = "Iniciado: " + dateOnlyFormat.format(Date(c.startDate)), 
                     color = MaterialTheme.colorScheme.onSurfaceVariant

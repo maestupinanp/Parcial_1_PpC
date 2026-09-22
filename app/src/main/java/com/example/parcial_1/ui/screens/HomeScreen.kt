@@ -2,9 +2,8 @@ package com.example.parcial_1.ui.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -13,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,6 +49,7 @@ fun HomeScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
         AppHeader()
 
@@ -61,7 +60,7 @@ fun HomeScreenContent(
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "La verdad siempre deja rastro",
+                text = "Nada es lo que parece a primera vista",
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -74,26 +73,16 @@ fun HomeScreenContent(
                 HomeCardData("Casos cerrados", "$closedCount finalizados", Icons.Default.AccessTime, MaterialTheme.colorScheme.surfaceVariant, onClosedCasesClick)
             )
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(cards) { card ->
-                    HomeCard(card)
+                cards.forEach { card ->
+                    HomeRowCard(card)
                 }
             }
             
-            Spacer(modifier = Modifier.weight(1f))
-            
-            Text(
-                text = "\"Observar, Analizar, Concluir.\"",
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                fontSize = 14.sp,
-                fontStyle = FontStyle.Italic,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
@@ -107,25 +96,45 @@ data class HomeCardData(
 )
 
 @Composable
-fun HomeCard(data: HomeCardData) {
+fun HomeRowCard(data: HomeCardData) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(140.dp)
             .clickable(onClick = data.onClick),
         colors = CardDefaults.cardColors(containerColor = data.color)
     ) {
-        Column(
+        Row(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween
+                .padding(20.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(imageVector = data.icon, contentDescription = null, modifier = Modifier.size(32.dp))
+            Icon(
+                imageVector = data.icon, 
+                contentDescription = null, 
+                modifier = Modifier.size(32.dp),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.width(20.dp))
             Column {
-                Text(text = data.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(text = data.subtitle, fontSize = 12.sp)
+                Text(
+                    text = data.title, 
+                    fontWeight = FontWeight.Bold, 
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = data.subtitle, 
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(
+                imageVector = Icons.Default.ChevronRight, 
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

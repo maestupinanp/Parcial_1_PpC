@@ -168,7 +168,7 @@ fun CaseItem(case: Case, onClick: () -> Unit) {
 
                 }
                 Text(
-                    text = "Caso #${case.id}",
+                    text = case.caseNumber,
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
