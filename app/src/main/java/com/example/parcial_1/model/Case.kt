@@ -17,5 +17,6 @@ data class Case(
     val clientName: String,
     val startDate: Long = System.currentTimeMillis(),
     val status: CaseStatus = CaseStatus.IN_INVESTIGATION,
-    val caseNumber: String = ""
+    val caseNumber: String = "",
+    val closingPrecedent: String = ""
 )

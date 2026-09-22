@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.parcial_1.ui.components.AppHeader
+import com.example.parcial_1.ui.components.StatusBadge
 import com.example.parcial_1.viewmodel.CaseViewModel
 import com.example.parcial_1.model.Case
 import com.example.parcial_1.model.CaseStatus
@@ -180,25 +181,6 @@ fun CaseItem(case: Case, onClick: () -> Unit) {
 
             }
         }
-    }
-}
-
-@Composable
-fun StatusBadge(status: CaseStatus) {
-    val color = if (status == CaseStatus.IN_INVESTIGATION) Color(0xFFFFECB3) else Color(0xFFC8E6C9)
-    val textColor = if (status == CaseStatus.IN_INVESTIGATION) Color(0xFF827717) else Color(0xFF2E7D32)
-    
-    Surface(
-        color = color,
-        shape = MaterialTheme.shapes.extraSmall
-    ) {
-        Text(
-            text = status.displayName,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            color = textColor
-        )
     }
 }
 

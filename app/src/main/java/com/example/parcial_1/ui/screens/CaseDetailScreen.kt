@@ -15,9 +15,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.parcial_1.model.Case
+import com.example.parcial_1.model.CaseStatus
 import com.example.parcial_1.model.Evidence
 import com.example.parcial_1.model.Finding
 import com.example.parcial_1.ui.components.AppHeader
+import com.example.parcial_1.ui.components.StatusBadge
 import com.example.parcial_1.viewmodel.CaseViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,6 +37,7 @@ fun CaseDetailScreen(
     val evidence by viewModel.getEvidenceForCase(caseId).collectAsState(initial = emptyList())
     
     val dateFormat = remember { SimpleDateFormat("dd MMM yyyy HH:mm", Locale.getDefault()) }
+    val dateOnlyFormat = remember { SimpleDateFormat("dd MMM yyyy", Locale.getDefault()) }
     val scrollState = rememberScrollState()
 
     var showAddFindingDialog by remember { mutableStateOf(false) }
@@ -83,7 +86,7 @@ fun CaseDetailScreen(
                 
                 Text(text = "Caso #${c.id}", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    text = "Iniciado: " + SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(c.startDate)), 
+                    text = "Iniciado: " + dateOnlyFormat.format(Date(c.startDate)), 
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
@@ -92,6 +95,10 @@ fun CaseDetailScreen(
                 Text(text = "Información general", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 DetailItem(label = "Cliente / Solicitante", value = c.clientName)
                 DetailItem(label = "Descripción", value = c.description)
+                
+                if (c.status == CaseStatus.CLOSED && c.closingPrecedent.isNotBlank()) {
+                    DetailItem(label = "Argumento de cierre / Precedente", value = c.closingPrecedent)
+                }
                 
                 HorizontalDivider()
                 

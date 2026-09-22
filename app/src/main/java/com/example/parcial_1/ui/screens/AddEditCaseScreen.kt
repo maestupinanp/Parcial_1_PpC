@@ -28,6 +28,7 @@ fun AddEditCaseScreen(
     var description by remember { mutableStateOf("") }
     var clientName by remember { mutableStateOf("") }
     var status by remember { mutableStateOf(CaseStatus.IN_INVESTIGATION) }
+    var closingPrecedent by remember { mutableStateOf("") }
     var startDate by remember { mutableStateOf(System.currentTimeMillis()) }
     var caseNumber by remember { mutableStateOf("") }
 
@@ -43,6 +44,7 @@ fun AddEditCaseScreen(
                 description = existingCase.description
                 clientName = existingCase.clientName
                 status = existingCase.status
+                closingPrecedent = existingCase.closingPrecedent
                 startDate = existingCase.startDate
                 caseNumber = existingCase.caseNumber
             }
@@ -130,6 +132,23 @@ fun AddEditCaseScreen(
                         )
                     }
             }
+
+            if (status == CaseStatus.CLOSED) {
+                OutlinedTextField(
+                    value = closingPrecedent,
+                    onValueChange = { closingPrecedent = it },
+                    label = { Text("Argumento de cierre / Precedente") },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3,
+                    placeholder = { Text("Describe el motivo del cierre del caso...") },
+                    supportingText = {
+                        if (closingPrecedent.isBlank()) {
+                            Text("Este campo es obligatorio para cerrar el caso", color = MaterialTheme.colorScheme.error)
+                        }
+                    },
+                    isError = closingPrecedent.isBlank()
+                )
+            }
             
             Button(
                 onClick = {
@@ -139,6 +158,7 @@ fun AddEditCaseScreen(
                         description = description,
                         clientName = clientName,
                         status = status,
+                        closingPrecedent = if (status == CaseStatus.CLOSED) closingPrecedent else "",
                         startDate = startDate,
                         caseNumber = if (caseNumber.isBlank() && caseId == null) {
                             "Caso #${(100..999).random()}"
@@ -154,7 +174,9 @@ fun AddEditCaseScreen(
                     onSaveSuccess()
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = title.isNotBlank() && clientName.isNotBlank()
+                enabled = title.isNotBlank() && 
+                        clientName.isNotBlank() && 
+                        (status != CaseStatus.CLOSED || closingPrecedent.isNotBlank())
             ) {
                 Text("Guardar")
             }

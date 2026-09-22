@@ -15,7 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-@Database(entities = [Case::class, Finding::class, Evidence::class], version = 5, exportSchema = false)
+@Database(entities = [Case::class, Finding::class, Evidence::class], version = 6, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun caseDao(): CaseDao
