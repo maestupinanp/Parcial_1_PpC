@@ -76,13 +76,12 @@ fun AddEditCaseScreen(
             Column {
                 AppHeader(subtitle = if (caseId == null) "Registrar nuevo expediente" else "Actualizar información del caso")
                 TopAppBar(
-                    title = { Text(if (caseId == null) "Nuevo Caso" else "Editarr Caso") },
+                    title = { Text(if (caseId == null) "Nuevo Caso" else "Editar Caso") },
                     actions = {
                         if (caseId != null) {
                             IconButton(onClick = { showDeleteDialog = true }) {
                                 Icon(Icons.Default.Delete, contentDescription = "Eliminar")
                             }
-
                         }
                     }
                 )
@@ -121,13 +120,15 @@ fun AddEditCaseScreen(
 
             Text("Estado", style = MaterialTheme.typography.labelLarge)
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                CaseStatus.entries.forEach { s ->
-                    FilterChip(
-                        selected = status == s,
-                        onClick = { status = s },
-                        label = { Text(s.displayName) }
-                    )
-                }
+                CaseStatus.entries
+                    .filter { if (caseId == null) it == CaseStatus.IN_INVESTIGATION else true }
+                    .forEach { s ->
+                        FilterChip(
+                            selected = status == s,
+                            onClick = { status = s },
+                            label = { Text(s.displayName) }
+                        )
+                    }
             }
             
             Button(

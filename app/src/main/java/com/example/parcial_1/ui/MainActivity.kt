@@ -92,7 +92,7 @@ fun CaseTrackApp(factory: CaseViewModelFactory) {
                                         saveState = true
                                     }
                                     launchSingleTop = true
-                                    restoreState = true
+                                    restoreState = false
                                 }
                             }
                         )
